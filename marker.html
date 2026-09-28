@@ -1,1 +1,23 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Marcador A4 · Antofagasta H₂ AR</title><style>body{margin:0;font:16px Arial;color:#12303b;background:#eee}main{width:297mm;height:210mm;margin:auto;background:white;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9mm}h1{font-size:19pt;margin:0}img{width:250mm;height:175mm;object-fit:contain}p{margin:0;font-size:10pt}@page{size:A4 landscape;margin:0}@media print{body{background:white}}@media screen and (max-width:1100px){main{width:100%;height:auto;padding:20px;box-sizing:border-box}img{width:100%;height:auto}}</style></head><body><main><h1>Antofagasta H₂ AR · Marcador de realidad aumentada</h1><img src="assets/marker/antofagasta-h2-marker.png" alt="Marcador de Antofagasta H2"><p>Imprime en A4 horizontal, al 100 %, sin recortar. Coloca la hoja en una superficie plana y con buena luz.</p></main></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Marcador A4 · Antofagasta H₂ AR</title>
+  <style>
+    body{margin:0;font:16px Arial,sans-serif;color:#12303b;background:#e9eeee}
+    nav{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;padding:13px;background:#103340;color:white}
+    nav a,nav button{border:1px solid #8fd9d1;border-radius:5px;padding:9px 12px;background:#164b55;color:white;font:700 13px Arial,sans-serif;text-decoration:none;cursor:pointer}
+    nav .active{background:#7ae5d9;color:#103340}
+    main{width:297mm;height:210mm;margin:16px auto;background:white;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9mm;box-shadow:0 10px 35px #17313a30}
+    h1{font-size:19pt;margin:0}img{width:250mm;height:175mm;object-fit:contain}p{margin:0;font-size:10pt;text-align:center}
+    @page{size:A4 landscape;margin:0}
+    @media print{body{background:white}nav{display:none}main{margin:0;box-shadow:none}}
+    @media screen and (max-width:1100px){main{width:calc(100% - 24px);height:auto;padding:20px;box-sizing:border-box}img{width:100%;height:auto}}
+  </style>
+</head>
+<body>
+  <nav aria-label="Versiones del marcador"><span>Marcador para imprimir:</span><a id="color-link" href="marker.html">Color</a><a id="bw-link" href="marker.html?bn=1">Blanco y negro</a><button type="button" onclick="window.print()">Imprimir A4 ↗</button></nav>
+  <main><h1>Antofagasta H₂ AR · Marcador de realidad aumentada</h1><img id="marker-image" src="assets/marker/antofagasta-h2-marker.png" alt="Marcador de Antofagasta H₂"><p>Imprime en A4 horizontal, al 100 %, sin recortar. Coloca la hoja plana y con buena luz.</p></main>
+  <script>if(new URLSearchParams(location.search).has('bn')){document.getElementById('marker-image').src='assets/marker/antofagasta-h2-marker-bn.png';document.getElementById('bw-link').classList.add('active')}else document.getElementById('color-link').classList.add('active')</script>
+</body>
+</html>

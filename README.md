@@ -8,9 +8,9 @@ Prototipo WebAR estático para la presentación de Tecnologías Disruptivas (INS
 2. En esta carpeta, ejecuta `npm install` y `npm start`.
 3. Abre `http://localhost:4173` en el computador. `viewer.html` funciona sin cámara.
 4. Para probar AR en un teléfono, publica el sitio con **HTTPS**. El `localhost` del computador no es el `localhost` del teléfono.
-5. Abre `marker.html` en un computador o tablet y muestra la imagen en esa pantalla, o imprímela en A4 horizontal al 100 %. También puedes descargar `assets/marker/antofagasta-h2-marker.png`. Evita reflejos; apunta con el teléfono a la imagen completa. **El marcador es una imagen física; no aparece al recorrer la habitación con la cámara.** Si solo dispones del teléfono, usa `viewer.html`.
+5. Abre `marker.html?bn=1` para imprimir el marcador **en blanco y negro** en A4 horizontal al 100 %, o usa `marker.html` para la versión en color. También puedes mostrar cualquiera de las dos en otro computador o tablet. Evita reflejos; apunta con el teléfono a la imagen completa. **El marcador es una imagen física; no aparece al recorrer la habitación con la cámara.** Si solo dispones del teléfono, usa `viewer.html`.
 
-Para pruebas automáticas en Chrome local: `npm test` y `node tests/ar-camera.mjs`. La segunda prueba usa una cámara simulada que muestra el marcador y verifica reconocimiento real en MindAR; no reemplaza una prueba con un teléfono físico. También se verificó el modo AR publicado con `node tests/ar-camera.mjs https://storbo2.github.io/antofagasta-h2-ar/ar.html`.
+Para pruebas automáticas en Chrome local: `npm test`, `node tests/ar-camera.mjs`, `node tests/ar-camera.mjs --bw` y `node tests/ar-camera.mjs --mono`. Las pruebas de cámara muestran, respectivamente, el marcador en color, escala de grises y blanco/negro puro a MindAR; no reemplazan una prueba con un teléfono y una hoja física. También se verificó el modo AR publicado con `node tests/ar-camera.mjs https://storbo2.github.io/antofagasta-h2-ar/ar.html`.
 
 ## Publicar gratis
 
@@ -21,7 +21,7 @@ Sitio publicado: **https://storbo2.github.io/antofagasta-h2-ar/**. El QR en `ass
 ## Uso en la presentación
 
 1. Escanea el QR y abre la página.
-2. Muestra el marcador impreso o en otra pantalla y pulsa **Iniciar experiencia AR**. Marcador público: **https://storbo2.github.io/antofagasta-h2-ar/marker.html**.
+2. Muestra el marcador impreso o en otra pantalla y pulsa **Iniciar experiencia AR**. Para la impresora de la universidad: **https://storbo2.github.io/antofagasta-h2-ar/marker.html?bn=1**.
 3. Explica la secuencia tocando la maqueta: solar, red, electrolizador, almacenamiento, estación y camión.
 4. Cambia a **Excedente solar**: 12 MW de generación, 8 MW de demanda y 4 MW disponibles para H₂. El sol crece, el electrolizador se ilumina, las partículas fluyen hacia el almacenamiento y sube el nivel visual del tanque.
 5. Cambia a **Uso del H₂**: el sol se reduce, la producción pasa a 0 kg/h, el flujo va del tanque a la hidrogenera, el primer camión sale y un segundo llega a cargar. La línea de estado narra la fase actual.
@@ -31,11 +31,11 @@ Las cifras de pantalla son **simuladas con fines demostrativos** y representan i
 
 ## Decisiones y dificultades
 
-- **Seguimiento de imagen:** se creó un marcador original de alto contraste y se compiló a `.mind` con MindAR. El target es la imagen PNG exacta que se imprime.
+- **Seguimiento de imagen:** se creó un marcador original de alto contraste y se compiló a `.mind` con MindAR. La misma referencia reconoce el marcador en color, escala de grises y blanco/negro puro en las pruebas con cámara simulada. `tools/make-marker-bw.mjs` genera la variante para impresora monocromática.
 - **Estabilidad:** la planta es una sola escena 3D de geometría simple compartida por AR y el visor. No hay modelos de terceros ni texturas pesadas. Los modelos se construyen en `js/model.js`; el marcador es original y está generado por `tools/make-marker.mjs`. No se requieren licencias de modelos externos.
 - **Permiso de cámara:** AR se inicia tras un toque explícito, con guía visible y enlace inmediato al modo 3D. El navegador exige HTTPS o localhost.
 - **Video de cámara oculto:** MindAR situaba el video con `z-index` negativo; el fondo de la página lo tapaba aunque el seguimiento sí funcionaba. Se aisló el contenedor AR como contexto de apilamiento y se añadió una prueba móvil que comprueba el video visible detrás de la maqueta.
-- **Visor 3D:** la primera prueba mostró la cámara apuntando fuera de la maqueta; se corrigió la orientación del control orbital. `npm test` verifica que la escena se dibuja, los escenarios cambian y no hay errores JavaScript.
+- **Visor 3D:** la maqueta se eleva en pantallas móviles para dejar espacio sobre el panel. `npm test` verifica la separación de ambos, que la escena se dibuja, que los escenarios cambian y que no hay errores JavaScript.
 - **Reconocimiento:** `tests/ar-camera.mjs` verifica que MindAR reconoce el marcador con una cámara simulada. Aún hay que probar el montaje físico en Android o iPhone antes de exponer.
 - **Escenarios animados:** `npm test` comprueba el aumento del sol, el flujo hacia el tanque, la salida del primer camión, la llegada del segundo y el texto de estado.
 
