@@ -8,7 +8,7 @@ Prototipo WebAR estático para la presentación de Tecnologías Disruptivas (INS
 2. En esta carpeta, ejecuta `npm install` y `npm start`.
 3. Abre `http://localhost:4173` en el computador. `viewer.html` funciona sin cámara.
 4. Para probar AR en un teléfono, publica el sitio con **HTTPS**. El `localhost` del computador no es el `localhost` del teléfono.
-5. Abre `marker.html` e imprime en A4 horizontal al 100 %, o descarga `assets/marker/antofagasta-h2-marker.png`. Evita reflejos; apunta con el teléfono a la imagen completa.
+5. Abre `marker.html` en un computador o tablet y muestra la imagen en esa pantalla, o imprímela en A4 horizontal al 100 %. También puedes descargar `assets/marker/antofagasta-h2-marker.png`. Evita reflejos; apunta con el teléfono a la imagen completa. **El marcador es una imagen física; no aparece al recorrer la habitación con la cámara.** Si solo dispones del teléfono, usa `viewer.html`.
 
 Para pruebas automáticas en Chrome local: `npm test` y `node tests/ar-camera.mjs`. La segunda prueba usa una cámara simulada que muestra el marcador y verifica reconocimiento real en MindAR; no reemplaza una prueba con un teléfono físico. También se verificó el modo AR publicado con `node tests/ar-camera.mjs https://storbo2.github.io/antofagasta-h2-ar/ar.html`.
 
@@ -21,13 +21,13 @@ Sitio publicado: **https://storbo2.github.io/antofagasta-h2-ar/**. El QR en `ass
 ## Uso en la presentación
 
 1. Escanea el QR y abre la página.
-2. Muestra el marcador impreso y pulsa **Iniciar experiencia AR**.
+2. Muestra el marcador impreso o en otra pantalla y pulsa **Iniciar experiencia AR**. Marcador público: **https://storbo2.github.io/antofagasta-h2-ar/marker.html**.
 3. Explica la secuencia tocando la maqueta: solar, red, electrolizador, almacenamiento, estación y camión.
-4. Cambia a **Excedente solar**: 12 MW de generación, 8 MW de demanda y 4 MW disponibles para H₂. Observa las partículas hacia electrólisis y almacenamiento.
-5. Cambia a **Uso del H₂** para mostrar el flujo desde el tanque hacia estación y camión.
+4. Cambia a **Excedente solar**: 12 MW de generación, 8 MW de demanda y 4 MW disponibles para H₂. El sol crece, el electrolizador se ilumina, las partículas fluyen hacia el almacenamiento y sube el nivel visual del tanque.
+5. Cambia a **Uso del H₂**: el sol se reduce, la producción pasa a 0 kg/h, el flujo va del tanque a la hidrogenera, el primer camión sale y un segundo llega a cargar. La línea de estado narra la fase actual.
 6. Si la cámara o el seguimiento fallan, abre **Ver modelo 3D sin RA**. Arrastra para girar y pellizca o usa la rueda para acercar.
 
-Las cifras de pantalla son **simuladas con fines demostrativos**. La regla conceptual de gestión es producir H₂ si hay generación solar superior a la demanda más un margen, y abastecer si existe reserva suficiente y demanda de transporte. No se implementa IA real ni se modela una planta construida. El agua para electrólisis en Antofagasta exigiría una fuente y tratamiento apropiados; estudiar agua desalinizada o tratada sería una siguiente etapa.
+Las cifras de pantalla son **simuladas con fines demostrativos** y representan instantáneas de cada escenario; las animaciones ilustran el flujo, sin recalcular esas cifras cuadro a cuadro. La regla conceptual de gestión es producir H₂ si hay generación solar superior a la demanda más un margen, y abastecer si existe reserva suficiente y demanda de transporte. No se implementa IA real ni se modela una planta construida. El agua para electrólisis en Antofagasta exigiría una fuente y tratamiento apropiados; estudiar agua desalinizada o tratada sería una siguiente etapa.
 
 ## Decisiones y dificultades
 
@@ -37,6 +37,7 @@ Las cifras de pantalla son **simuladas con fines demostrativos**. La regla conce
 - **Video de cámara oculto:** MindAR situaba el video con `z-index` negativo; el fondo de la página lo tapaba aunque el seguimiento sí funcionaba. Se aisló el contenedor AR como contexto de apilamiento y se añadió una prueba móvil que comprueba el video visible detrás de la maqueta.
 - **Visor 3D:** la primera prueba mostró la cámara apuntando fuera de la maqueta; se corrigió la orientación del control orbital. `npm test` verifica que la escena se dibuja, los escenarios cambian y no hay errores JavaScript.
 - **Reconocimiento:** `tests/ar-camera.mjs` verifica que MindAR reconoce el marcador con una cámara simulada. Aún hay que probar el montaje físico en Android o iPhone antes de exponer.
+- **Escenarios animados:** `npm test` comprueba el aumento del sol, el flujo hacia el tanque, la salida del primer camión, la llegada del segundo y el texto de estado.
 
 ## Tecnología y atribuciones
 
