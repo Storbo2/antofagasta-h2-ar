@@ -34,6 +34,7 @@ Las cifras de pantalla son **simuladas con fines demostrativos**. La regla conce
 - **Seguimiento de imagen:** se creó un marcador original de alto contraste y se compiló a `.mind` con MindAR. El target es la imagen PNG exacta que se imprime.
 - **Estabilidad:** la planta es una sola escena 3D de geometría simple compartida por AR y el visor. No hay modelos de terceros ni texturas pesadas. Los modelos se construyen en `js/model.js`; el marcador es original y está generado por `tools/make-marker.mjs`. No se requieren licencias de modelos externos.
 - **Permiso de cámara:** AR se inicia tras un toque explícito, con guía visible y enlace inmediato al modo 3D. El navegador exige HTTPS o localhost.
+- **Video de cámara oculto:** MindAR situaba el video con `z-index` negativo; el fondo de la página lo tapaba aunque el seguimiento sí funcionaba. Se aisló el contenedor AR como contexto de apilamiento y se añadió una prueba móvil que comprueba el video visible detrás de la maqueta.
 - **Visor 3D:** la primera prueba mostró la cámara apuntando fuera de la maqueta; se corrigió la orientación del control orbital. `npm test` verifica que la escena se dibuja, los escenarios cambian y no hay errores JavaScript.
 - **Reconocimiento:** `tests/ar-camera.mjs` verifica que MindAR reconoce el marcador con una cámara simulada. Aún hay que probar el montaje físico en Android o iPhone antes de exponer.
 

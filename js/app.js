@@ -21,7 +21,7 @@
     const message=(txt)=>{status.textContent=txt;status.classList.remove('hidden')};
     target.addEventListener('targetFound',()=>{scan.classList.add('hidden');message('Marcador reconocido · toca un componente para conocerlo');setTimeout(()=>status.classList.add('hidden'),4000)});
     target.addEventListener('targetLost',()=>{scan.classList.remove('hidden');status.classList.add('hidden')});
-    start.addEventListener('click',async()=>{start.disabled=true;start.textContent='Iniciando cámara…';try{await scene.systems['mindar-image-system'].start();overlay.classList.add('hidden');scan.classList.remove('hidden');}catch(e){console.error(e);message('No se pudo iniciar la cámara. Revisa el permiso o abre el modelo 3D.');start.disabled=false;start.textContent='Reintentar cámara';}});
+    start.addEventListener('click',async()=>{start.disabled=true;start.textContent='Iniciando cámara…';document.getElementById('camera-error').classList.add('hidden');try{await scene.systems['mindar-image-system'].start();overlay.classList.add('hidden');scan.classList.remove('hidden');}catch(e){console.error(e);const error=document.getElementById('camera-error');error.textContent='No se pudo iniciar la cámara. Revisa el permiso de Chrome o abre el modelo 3D.';error.classList.remove('hidden');start.disabled=false;start.textContent='Reintentar cámara';}});
   }
   showScenario('normal');
 })();
