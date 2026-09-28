@@ -39,7 +39,7 @@ Las cifras de pantalla son **simuladas con fines demostrativos**. La regla conce
 
 ## Tecnología y atribuciones
 
-- [A-Frame 1.5.0](https://aframe.io/) y [MindAR 1.2.5](https://github.com/hiukim/mind-ar-js) distribuidos en `vendor/`, usados según sus licencias abiertas.
+- [A-Frame 1.5.0](https://aframe.io/) y [MindAR 1.2.5](https://github.com/hiukim/mind-ar-js) distribuidos en `vendor/` bajo licencia MIT. Avisos completos en `THIRD_PARTY_NOTICES.md`.
 - Maqueta 3D, marcador, interfaz y lógica originales de este proyecto. No se usan modelos externos.
 - Google Fonts (`DM Sans`, `Space Grotesk`) se cargan en línea; si no hay conexión, se usan fuentes del sistema. Las bibliotecas JS principales están guardadas localmente.
 
