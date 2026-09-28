@@ -1,0 +1,15 @@
+{
+  "name": "antofagasta-h2-ar",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npx http-server . -p 4173 -c-1",
+    "test": "node tests/smoke.mjs"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "playwright-core": "^1.55.0",
+    "qrcode": "^1.5.4",
+    "sharp": "^0.34.3"
+  }
+}

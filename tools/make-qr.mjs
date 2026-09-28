@@ -1,0 +1,2 @@
+import QRCode from 'qrcode';import fs from 'node:fs';
+const url=process.argv[2];if(!url||!/^https:\/\//i.test(url)){console.error('Uso: node tools/make-qr.mjs https://URL-PUBLICA/');process.exit(1)}fs.mkdirSync('assets/qr',{recursive:true});await QRCode.toFile('assets/qr/qr-publicado.png',url,{width:1000,margin:3,color:{dark:'#092431',light:'#ffffff'},errorCorrectionLevel:'H'});fs.writeFileSync('assets/qr/url.txt',url+'\n');console.log('QR creado para',url);
