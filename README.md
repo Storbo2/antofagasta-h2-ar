@@ -16,7 +16,7 @@ Para pruebas automáticas en Chrome local: `npm test` y `node tests/ar-camera.mj
 
 Este proyecto no requiere compilación ni backend. En GitHub Pages, crea un repositorio público, sube los archivos de esta carpeta **sin `node_modules/` ni `work/`**, abre **Settings → Pages**, elige **Deploy from a branch** y selecciona `main / (root)`. Usa la URL `https://USUARIO.github.io/REPOSITORIO/`. También puedes desplegar la carpeta en Netlify o Vercel como sitio estático sin comando de build. Comprueba el modo AR en el teléfono con esa URL HTTPS antes de la presentación.
 
-El QR debe apuntar a la URL pública de `index.html`, no a `localhost`. Genera `assets/qr/qr-publicado.png` con `node tools/make-qr.mjs https://URL-PUBLICA/` después de publicar. No hay QR público válido antes de contar con la URL publicada.
+Sitio publicado: **https://storbo2.github.io/antofagasta-h2-ar/**. El QR en `assets/qr/qr-publicado.png` apunta a esa URL. Para regenerarlo después de cambiar el dominio: `node tools/make-qr.mjs https://NUEVA-URL/`.
 
 ## Uso en la presentación
 
