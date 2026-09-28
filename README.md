@@ -10,7 +10,7 @@ Prototipo WebAR estático para la presentación de Tecnologías Disruptivas (INS
 4. Para probar AR en un teléfono, publica el sitio con **HTTPS**. El `localhost` del computador no es el `localhost` del teléfono.
 5. Abre `marker.html` e imprime en A4 horizontal al 100 %, o descarga `assets/marker/antofagasta-h2-marker.png`. Evita reflejos; apunta con el teléfono a la imagen completa.
 
-Para pruebas automáticas en Chrome local: `npm test` y `node tests/ar-camera.mjs`. La segunda prueba usa una cámara simulada que muestra el marcador y verifica reconocimiento real en MindAR; no reemplaza una prueba con un teléfono físico.
+Para pruebas automáticas en Chrome local: `npm test` y `node tests/ar-camera.mjs`. La segunda prueba usa una cámara simulada que muestra el marcador y verifica reconocimiento real en MindAR; no reemplaza una prueba con un teléfono físico. También se verificó el modo AR publicado con `node tests/ar-camera.mjs https://storbo2.github.io/antofagasta-h2-ar/ar.html`.
 
 ## Publicar gratis
 

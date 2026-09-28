@@ -55,7 +55,7 @@
     remove(){this.el.removeObject3D('plant');if(window.plantModel===this)window.plantModel=null;}
   });
   AFRAME.registerComponent('orbit-camera',{
-    init(){this.yaw=0;this.pitch=.55;this.distance=1.25;this.drag=false;this.last=null;this.pinch=0;const canvas=()=>this.el.sceneEl.canvas;
+    init(){this.yaw=0;this.pitch=.55;this.distance=window.innerWidth<600?1.9:1.25;this.drag=false;this.last=null;this.pinch=0;const canvas=()=>this.el.sceneEl.canvas;
       this.onDown=e=>{if(e.target!==canvas())return;this.drag=true;this.last=[e.clientX,e.clientY];};
       this.onMove=e=>{if(!this.drag)return;this.yaw-=(e.clientX-this.last[0])*.006;this.pitch=Math.max(.22,Math.min(1.35,this.pitch+(e.clientY-this.last[1])*.005));this.last=[e.clientX,e.clientY];};
       this.onUp=()=>{this.drag=false;};
