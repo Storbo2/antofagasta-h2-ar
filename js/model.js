@@ -3,6 +3,7 @@
   const T = AFRAME.THREE;
   const C = { sand:0x9b8267, edge:0x3d6170, dark:0x0d2632, steel:0xc5d5d5, cyan:0x57e6dc, green:0x8debbb, blue:0x1f91b4, orange:0xffb957, white:0xf4f9f4, road:0x314b54 };
   const info = {
+    sun:['00 / FUENTE','Sol de Atacama','La radiación solar llega a los paneles fotovoltaicos. Su intensidad cambia a lo largo del día y determina cuánta electricidad puede generarse.'],
     solar:['01 / ENERGÍA','Generación solar','Los paneles transforman la radiación solar de Antofagasta en electricidad renovable.'],
     grid:['02 / DISTRIBUCIÓN','Red eléctrica','La electricidad atiende primero la demanda. Solo la energía disponible bajo las reglas simuladas alimenta la electrólisis.'],
     electro:['03 / CONVERSIÓN','Electrolizador','Utiliza electricidad renovable y agua tratada para separar el hidrógeno del oxígeno mediante electrólisis.'],
@@ -14,23 +15,27 @@
   const mat = (color, emissive=0x000000) => new T.MeshStandardMaterial({color,roughness:.55,metalness:.15,emissive,emissiveIntensity:.32});
   const M = Object.fromEntries(Object.entries(C).map(([k,v])=>[k,mat(v)]));
   const glow = (c) => new T.MeshBasicMaterial({color:c});
+  function paintedTexture(type){const canvas=document.createElement('canvas');canvas.width=512;canvas.height=type==='sand'?350:192;const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height;ctx.fillStyle=type==='sand'?'#826e59':type==='road'?'#293f47':'#1c829c';ctx.fillRect(0,0,w,h);let seed=type==='sand'?71237:type==='road'?81273:35172;const random=()=>{seed=(1664525*seed+1013904223)>>>0;return seed/4294967296};if(type==='panel'){const shine=ctx.createLinearGradient(0,0,w,h);shine.addColorStop(0,'#75dcda44');shine.addColorStop(.55,'#164b7477');shine.addColorStop(1,'#b1ffff33');ctx.fillStyle=shine;ctx.fillRect(0,0,w,h);ctx.strokeStyle='#8dddda88';ctx.lineWidth=3;for(let x=0;x<w;x+=85){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}for(let y=0;y<h;y+=64){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}}else{for(let i=0;i<(type==='sand'?1250:850);i++){const x=random()*w,y=random()*h,r=.3+random()*(type==='sand'?1.9:1.1);ctx.fillStyle=random()>.52?'#ffffff1b':'#132c361b';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}if(type==='sand'){ctx.strokeStyle='#f3d5aa22';ctx.lineWidth=2;for(let i=0;i<5;i++){const y=25+i*71;ctx.beginPath();ctx.moveTo(0,y);ctx.bezierCurveTo(150,y-20,290,y+22,512,y-6);ctx.stroke()}}}const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;return texture;}
+  function softHalo(parent){const canvas=document.createElement('canvas');canvas.width=canvas.height=128;const ctx=canvas.getContext('2d'),gradient=ctx.createRadialGradient(64,64,12,64,64,63);gradient.addColorStop(0,'#ffd470aa');gradient.addColorStop(.42,'#ffae4d55');gradient.addColorStop(1,'#ffae4d00');ctx.fillStyle=gradient;ctx.fillRect(0,0,128,128);const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;const sprite=new T.Sprite(new T.SpriteMaterial({map:texture,transparent:true,opacity:.5,depthWrite:false,depthTest:false,blending:T.AdditiveBlending}));sprite.position.z=-.015;sprite.scale.set(.25,.25,1);parent.add(sprite);return sprite;}
   function box(parent,w,h,d,x,y,z,m){ const o=new T.Mesh(new T.BoxGeometry(w,h,d),m);o.position.set(x,y,z);parent.add(o);return o; }
   function cyl(parent,r,h,x,y,z,m,n=12){ const o=new T.Mesh(new T.CylinderGeometry(r,r,h,n),m);o.position.set(x,y,z);parent.add(o);return o; }
   function sphere(parent,r,x,y,z,m){const o=new T.Mesh(new T.SphereGeometry(r,12,8),m);o.position.set(x,y,z);parent.add(o);return o;}
   function line(parent,points,color,r=.003){for(let i=1;i<points.length;i++){const a=new T.Vector3(...points[i-1]),b=new T.Vector3(...points[i]);const d=new T.Vector3().subVectors(b,a);const mesh=new T.Mesh(new T.CylinderGeometry(r,r,d.length(),6),glow(color));mesh.position.copy(a).add(b).multiplyScalar(.5);mesh.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.normalize());parent.add(mesh);}}
   function label(parent,text,x,y,z,accent=C.white){const canvas=document.createElement('canvas');canvas.width=512;canvas.height=96;const ctx=canvas.getContext('2d');ctx.fillStyle='rgba(8,27,38,.88)';ctx.fillRect(4,4,504,88);ctx.strokeStyle='#4ba9ab';ctx.lineWidth=3;ctx.strokeRect(4,4,504,88);ctx.fillStyle='#'+accent.toString(16).padStart(6,'0');ctx.font='bold 37px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,256,50);const tex=new T.CanvasTexture(canvas);const sprite=new T.Sprite(new T.SpriteMaterial({map:tex,transparent:true,depthWrite:false}));sprite.position.set(x,y,z);sprite.scale.set(.28,.052,1);parent.add(sprite);return sprite;}
   function hit(parent,id,x,z,w,d){const mesh=box(parent,w,.17,d,x,.10,z,new T.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));mesh.userData.infoId=id;return mesh;}
-  function makeTruck(parent,cabColor){const group=new T.Group();group.userData.wheels=[];parent.add(group);box(group,.19,.085,.105,0,.065,0,M.steel);box(group,.09,.075,.108,.10,.069,0,mat(cabColor));box(group,.055,.028,.003,.12,.087,-.056,M.dark);box(group,.09,.018,.11,0,.106,0,M.green);box(group,.012,.009,.11,-.095,.09,0,M.cyan);box(group,.012,.008,.008,.147,.043,-.044,M.white);box(group,.012,.008,.008,.147,.043,.044,M.white);for(let x of [-.05,.06,.12])for(let z of [-.06,.06]){const wheel=new T.Mesh(new T.CylinderGeometry(.019,.019,.009,10),M.dark);wheel.rotation.x=Math.PI/2;wheel.position.set(x,.025,z);group.add(wheel);group.userData.wheels.push(wheel);cyl(group,.008,.010,x,.025,z+(z>0?.006:-.006),M.steel,10).rotation.x=Math.PI/2;}return group;}
+  function makeTruck(parent,cabColor){const group=new T.Group();group.userData.wheels=[];group.userData.dust=[];parent.add(group);box(group,.19,.085,.105,0,.065,0,M.steel);box(group,.09,.075,.108,.10,.069,0,mat(cabColor));box(group,.055,.028,.003,.12,.087,-.056,M.dark);box(group,.09,.018,.11,0,.106,0,M.green);box(group,.012,.009,.11,-.095,.09,0,M.cyan);box(group,.012,.008,.008,.147,.043,-.044,M.white);box(group,.012,.008,.008,.147,.043,.044,M.white);box(group,.11,.006,.003,-.01,.072,-.055,M.blue);box(group,.026,.014,.004,-.04,.082,-.056,M.green);for(let x of [-.05,.06,.12])for(let z of [-.06,.06]){const wheel=new T.Mesh(new T.CylinderGeometry(.019,.019,.009,10),M.dark);wheel.rotation.x=Math.PI/2;wheel.position.set(x,.025,z);group.add(wheel);group.userData.wheels.push(wheel);cyl(group,.008,.010,x,.025,z+(z>0?.006:-.006),M.steel,10).rotation.x=Math.PI/2;}for(let i=0;i<4;i++){const puff=sphere(group,.010,0,0,0,new T.MeshBasicMaterial({color:0xd8bc95,transparent:true,opacity:0,depthWrite:false}));puff.visible=false;group.userData.dust.push(puff)}return group;}
   AFRAME.registerComponent('plant-model',{
     init(){this.root=new T.Group();this.el.setObject3D('plant',this.root);if(document.body.classList.contains('viewer-mode')&&window.innerWidth<600)this.el.object3D.position.y=.25;this.pickables=[];this.packets=[];this.scenario='normal';this.build();window.plantModel=this;},
     build(){const g=this.root;
-      box(g,1.10,.035,.75,0,-.025,0,M.edge);box(g,1.08,.012,.73,0,-.002,0,M.sand);
+      const sandTop=new T.MeshStandardMaterial({map:paintedTexture('sand'),roughness:1});const roadTop=new T.MeshStandardMaterial({map:paintedTexture('road'),roughness:1});const panelTop=new T.MeshStandardMaterial({map:paintedTexture('panel'),roughness:.28,metalness:.25});
+      box(g,1.10,.035,.75,0,-.025,0,M.edge);box(g,1.08,.012,.73,0,-.002,0,[M.sand,M.sand,sandTop,M.sand,M.sand,M.sand]);
       // Traces of the Atacama terrain and access road.
       for(let i=0;i<28;i++){const x=-.51+((i*37)%101)/100*1.02,z=-.34+((i*23)%79)/79*.68;box(g,.012,.002,.005,x,.006,z,i%3?M.steel:M.orange);}
-      box(g,1.04,.003,.115,0,.007,.245,M.road);for(let x=-.46;x<.5;x+=.11)box(g,.055,.002,.003,x,.010,.245,M.orange);box(g,1.04,.002,.003,0,.010,.18,M.steel);box(g,1.04,.002,.003,0,.010,.31,M.steel);
+      this.road=box(g,1.04,.003,.17,0,.007,.26,[M.road,M.road,roadTop,M.road,M.road,M.road]);for(let x=-.46;x<.5;x+=.11)box(g,.055,.002,.003,x,.010,.26,M.orange);box(g,1.04,.002,.003,0,.010,.175,M.steel);box(g,1.04,.002,.003,0,.010,.345,M.steel);box(g,.19,.002,.006,.145,.011,.175,M.orange);
       // Solar array, with individual cells and supports.
-      for(let row=0;row<2;row++)for(let col=0;col<3;col++){const x=-.46+col*.11,z=-.255+row*.12;box(g,.096,.004,.077,x,.072,z,M.dark);box(g,.092,.009,.073,x,.077,z,M.blue);box(g,.088,.002,.003,x,.083,z,M.cyan);box(g,.003,.002,.068,x,.083,z,M.cyan);box(g,.003,.002,.068,x-.026,.083,z,M.cyan);box(g,.003,.002,.068,x+.026,.083,z,M.cyan);box(g,.004,.055,.004,x,.040,z,M.steel);}
-      this.sunGroup=new T.Group();this.sunGroup.position.set(-.40,.35,-.30);g.add(this.sunGroup);this.sunHalo=sphere(this.sunGroup,.083,0,0,0,new T.MeshBasicMaterial({color:C.orange,transparent:true,opacity:.16,depthWrite:false,blending:T.AdditiveBlending}));sphere(this.sunGroup,.055,0,0,0,M.orange);this.sunRays=new T.Group();this.sunGroup.add(this.sunRays);for(let a=0;a<8;a++){const q=a*Math.PI/4;line(this.sunRays,[[Math.cos(q)*.074,Math.sin(q)*.074,0],[Math.cos(q)*.095,Math.sin(q)*.095,0]],C.orange,.002);}
+      for(let row=0;row<2;row++)for(let col=0;col<3;col++){const x=-.46+col*.11,z=-.255+row*.12;box(g,.096,.004,.077,x,.072,z,M.dark);box(g,.092,.009,.073,x,.077,z,[M.blue,M.blue,panelTop,M.blue,M.blue,M.blue]);box(g,.088,.002,.003,x,.083,z,M.cyan);box(g,.003,.002,.068,x,.083,z,M.cyan);box(g,.003,.002,.068,x-.026,.083,z,M.cyan);box(g,.003,.002,.068,x+.026,.083,z,M.cyan);box(g,.004,.055,.004,x,.040,z,M.steel);}
+      this.sunGroup=new T.Group();this.sunGroup.position.set(-.40,.35,-.30);g.add(this.sunGroup);this.sunHalo=softHalo(this.sunGroup);sphere(this.sunGroup,.055,0,0,0,M.orange);this.sunRays=new T.Group();this.sunGroup.add(this.sunRays);for(let a=0;a<8;a++){const q=a*Math.PI/4;line(this.sunRays,[[Math.cos(q)*.074,Math.sin(q)*.074,0],[Math.cos(q)*.095,Math.sin(q)*.095,0]],C.orange,.002);}const sunHit=sphere(this.sunGroup,.105,0,0,0,new T.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));sunHit.userData.infoId='sun';this.pickables.push(sunHit);
+      this.sunStreams=[];for(let i=0;i<3;i++){const from=new T.Vector3(-.40,.30,-.30),to=new T.Vector3(-.46+i*.11,.088,-.255);const beam=new T.Line(new T.BufferGeometry().setFromPoints([from,to]),new T.LineBasicMaterial({color:C.orange,transparent:true,opacity:.25,depthWrite:false}));g.add(beam);const sparks=[0,.5].map(()=>sphere(g,.007,0,0,0,glow(C.orange)));this.sunStreams.push({from,to,beam,sparks});}
       label(g,'GENERACIÓN SOLAR',-.34,.23,-.10,C.orange);
       // A small grid substation.
       box(g,.12,.035,.13,-.075,.03,-.18,M.dark);for(let i=0;i<3;i++){cyl(g,.012,.10,-.115+i*.04,.09,-.18,M.steel,8);sphere(g,.014,-.115+i*.04,.15,-.18,M.cyan);}line(g,[[-.29,.08,-.19],[-.16,.13,-.19],[-.115,.13,-.19]],C.orange,.0025);label(g,'RED ELÉCTRICA',-.075,.22,-.18,C.cyan);
@@ -41,28 +46,30 @@
       // Smart energy controller, linked to sensor points.
       box(g,.13,.07,.11,-.20,.045,.075,M.dark);box(g,.085,.038,.004,-.20,.06,.018,M.cyan);sphere(g,.014,-.20,.15,.075,M.green);line(g,[[-.20,.09,.075],[-.20,.14,.075]],C.green,.003);label(g,'GESTIÓN SMART',-.20,.205,.075,C.cyan);
       // Hydrogen station canopy and dispenser.
-      box(g,.19,.012,.14,.14,.17,.13,M.white);box(g,.19,.007,.009,.14,.17,.202,M.green);for(let x of [.065,.215])box(g,.009,.155,.009,x,.09,.08,M.steel);box(g,.055,.09,.04,.09,.055,.17,M.blue);this.stationGlow=box(g,.035,.026,.006,.09,.077,.147,new T.MeshBasicMaterial({color:C.green,transparent:true,opacity:.35,depthWrite:false}));line(g,[[.115,.09,.17],[.15,.08,.20],[.18,.04,.20]],C.green,.002);label(g,'HIDROGENERA',.14,.235,.13,C.green);
+      box(g,.19,.012,.14,.14,.17,.13,M.white);box(g,.19,.007,.009,.14,.17,.202,M.green);for(let x of [.065,.215])box(g,.009,.155,.009,x,.09,.08,M.steel);box(g,.055,.09,.04,.09,.055,.17,M.blue);this.stationGlow=box(g,.035,.026,.006,.09,.077,.147,new T.MeshBasicMaterial({color:C.green,transparent:true,opacity:.35,depthWrite:false}));this.fuelHose=new T.Group();g.add(this.fuelHose);line(this.fuelHose,[[.11,.075,.19],[.15,.06,.20],[.20,.082,.194]],C.dark,.003);sphere(this.fuelHose,.008,.20,.082,.194,glow(C.green));this.fuelHose.visible=false;label(g,'HIDROGENERA',.14,.235,.13,C.green);
       // Heavy truck, stylized fuel-cell logistics vehicle.
-      this.truckA=makeTruck(g,C.cyan);this.truckA.position.set(.36,0,.22);this.truckB=makeTruck(g,C.orange);this.truckB.position.set(-.60,0,.22);this.truckB.visible=false;label(g,'CAMIÓN H₂',.40,.175,.32,C.white);
-      const points={solar:[-.30,.06,-.18],grid:[-.08,.08,-.18],electro:[.15,.08,-.18],tank:[.39,.10,-.18],station:[.14,.04,.13],truck:[.38,.07,.22]};
+      this.truckA=makeTruck(g,C.cyan);this.truckA.position.set(.24,0,.25);this.truckB=makeTruck(g,C.orange);this.truckB.position.set(-.42,0,.25);this.truckB.visible=false;label(g,'CAMIÓN H₂',.37,.175,.34,C.white);
+      const points={solar:[-.30,.06,-.18],grid:[-.08,.08,-.18],electro:[.15,.08,-.18],tank:[.39,.10,-.18],station:[.14,.04,.13],truck:[.20,.07,.194]};
       const paths=[['solar','grid'],['grid','electro'],['electro','tank'],['tank','station'],['station','truck']];
       this.paths=paths.map(([a,b],i)=>{const from=new T.Vector3(...points[a]),to=new T.Vector3(...points[b]);if(i===3){const mid=new T.Vector3(.40,.045,.075);line(g,[from.toArray(),mid.toArray(),to.toArray()],i<2?C.orange:C.green,.002);return [from,mid,to];}line(g,[from.toArray(),to.toArray()],i<2?C.orange:C.green,.002);return [from,to];});
       for(let i=0;i<this.paths.length;i++)for(let j=0;j<3;j++){const mesh=sphere(g,.008,0,0,0,glow(i<2?C.orange:C.green));this.packets.push({mesh,path:i,offset:j/3});}
-      for(const [id,x,z,w,d] of [['solar',-.35,-.20,.34,.25],['grid',-.075,-.18,.14,.16],['electro',.15,-.18,.21,.17],['tank',.40,-.18,.19,.20],['station',.14,.13,.20,.18],['truck',.40,.22,.20,.16],['smart',-.20,.075,.15,.13]])this.pickables.push(hit(g,id,x,z,w,d));
+      for(const [id,x,z,w,d] of [['solar',-.35,-.20,.34,.25],['grid',-.075,-.18,.14,.16],['electro',.15,-.18,.21,.17],['tank',.40,-.18,.19,.20],['station',.14,.13,.17,.15],['truck',.29,.26,.21,.16],['smart',-.20,.075,.15,.13]])this.pickables.push(hit(g,id,x,z,w,d));
       g.add(new T.HemisphereLight(0xffffff,0x6a7a79,1.2));const sun=new T.DirectionalLight(0xffffff,1.0);sun.position.set(-.4,.8,.5);g.add(sun);
     },
     setScenario(s){this.scenario=s;this.started=performance.now();this.lastPhase='';},
+    animateDust(truck,age){truck.userData.dust.forEach((p,i)=>{const active=age>=0&&age<.85;p.visible=active;if(!active)return;const stagger=i*.13,life=Math.max(0,Math.min(1,(age-stagger)/.65));p.position.set(-.095-life*.075-(i%2)*.01,.026+life*.038,(i%2?.064:-.064)+(i<2?-.01:.01));p.scale.setScalar(.55+life*2.1);p.material.opacity=(1-life)*.46;});},
     animateVehicles(elapsed){
-      this.truckA.position.x=.36;this.truckA.visible=true;this.truckB.visible=false;
-      if(this.scenario!=='use')return true;
+      this.truckA.position.set(.24,0,.25);this.truckA.visible=true;this.truckB.position.z=.25;this.truckB.visible=false;
+      if(this.scenario!=='use'){this.animateDust(this.truckA,-1);this.animateDust(this.truckB,-1);return false;}
       const t=elapsed%10;let phase='';let fuelling=false;
       if(t<2.8){phase='Camión 1 cargando en la hidrogenera';fuelling=true;}
-      else if(t<4.5){this.truckA.position.x=.36+(t-2.8)/1.7*.40;this.truckB.position.x=-.60;this.truckB.visible=true;phase='Camión 1 parte · llega otro vehículo';}
-      else if(t<7){this.truckA.visible=false;this.truckB.visible=true;this.truckB.position.x=-.60+(t-4.5)/2.5*.96;phase='Camión 2 se acerca a la estación';}
-      else{this.truckA.visible=false;this.truckB.visible=true;this.truckB.position.x=.36;phase='Camión 2 cargando H₂';fuelling=true;}
+      else if(t<4.5){const u=(t-2.8)/1.7,e=u*u*(3-2*u);this.truckA.position.x=.24+e*.22;phase='Camión 1 parte · llega otro vehículo';}
+      else if(t<7){const u=(t-4.5)/2.5,e=u*u*(3-2*u);this.truckA.visible=false;this.truckB.visible=true;this.truckB.position.x=-.42+e*.66;phase='Camión 2 se acerca a la estación';}
+      else{this.truckA.visible=false;this.truckB.visible=true;this.truckB.position.x=.24;phase='Camión 2 cargando H₂';fuelling=true;}
       if(this.lastPhase!==phase){this.lastPhase=phase;document.dispatchEvent(new CustomEvent('plantphase',{detail:phase}));}
-      if(t>=2.8&&t<4.5)this.truckA.userData.wheels.forEach(w=>w.rotation.y+=.18);
-      if(t>=4.5&&t<7)this.truckB.userData.wheels.forEach(w=>w.rotation.y+=.18);
+      if(t>=2.8&&t<4.5)this.truckA.userData.wheels.forEach(w=>w.rotation.z-=.18);
+      if(t>=4.5&&t<7)this.truckB.userData.wheels.forEach(w=>w.rotation.z-=.18);
+      this.animateDust(this.truckA,t-2.8);this.animateDust(this.truckB,t-4.5);
       return fuelling;
     },
     tick(){
@@ -70,10 +77,12 @@
       const flow=flowByScenario[this.scenario]||flowByScenario.normal;
       const elapsed=Math.max(0,(performance.now()-(this.started||performance.now()))/1000);
       const fuelling=this.animateVehicles(elapsed);
+      this.fuelHose.visible=this.scenario==='use'&&fuelling;
       const sunTarget=this.scenario==='surplus'?1.95:this.scenario==='use'?.72:1;
       const sunScale=this.sunGroup.scale.x+(sunTarget-this.sunGroup.scale.x)*.11;
       this.sunGroup.scale.setScalar(sunScale);this.sunRays.rotation.z=elapsed*(this.scenario==='surplus'?.35:.09);
-      this.sunHalo.material.opacity=this.scenario==='surplus'?.27+.10*Math.sin(elapsed*4):.12;
+      this.sunHalo.material.opacity=this.scenario==='surplus'?.70+.20*Math.sin(elapsed*4):.38;
+      this.sunStreams.forEach((stream,i)=>{const intensity=this.scenario==='surplus'?1.5:this.scenario==='use'?.3:1;stream.beam.material.opacity=.12+.25*intensity;stream.sparks.forEach((spark,j)=>{const phase=(elapsed*(.45+.32*intensity)+j*.5+i*.13)%1;spark.position.copy(stream.from).lerp(stream.to,phase);spark.scale.setScalar(.48+.55*intensity);spark.visible=true;});});
       this.electroGlow.material.opacity=this.scenario==='surplus'?.65+.30*Math.abs(Math.sin(elapsed*5)):this.scenario==='normal'?.28:.12;
       this.stationGlow.material.opacity=this.scenario==='use'?.65+.30*Math.abs(Math.sin(elapsed*6)):.24;
       const fill=this.scenario==='surplus'?Math.min(.95,.45+elapsed*.055):this.scenario==='use'?Math.max(.35,.76-(elapsed%10)*.04):.48;

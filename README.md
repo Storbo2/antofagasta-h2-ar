@@ -22,9 +22,9 @@ Sitio publicado: **https://storbo2.github.io/antofagasta-h2-ar/**. El QR en `ass
 
 1. Escanea el QR y abre la página.
 2. Muestra el marcador impreso o en otra pantalla y pulsa **Iniciar experiencia AR**. Para la impresora de la universidad: **https://storbo2.github.io/antofagasta-h2-ar/marker.html?bn=1**.
-3. Explica la secuencia tocando la maqueta: solar, red, electrolizador, almacenamiento, estación y camión.
+3. Explica la secuencia tocando el sol y los componentes de la maqueta: paneles, red, electrolizador, almacenamiento, estación y camión. Se puede tocar el sol tanto en AR como en el visor 3D.
 4. Cambia a **Excedente solar**: 12 MW de generación, 8 MW de demanda y 4 MW disponibles para H₂. El sol crece, el electrolizador se ilumina, las partículas fluyen hacia el almacenamiento y sube el nivel visual del tanque.
-5. Cambia a **Uso del H₂**: el sol se reduce, la producción pasa a 0 kg/h, el flujo va del tanque a la hidrogenera, el primer camión sale y un segundo llega a cargar. La línea de estado narra la fase actual.
+5. Cambia a **Uso del H₂**: el sol se reduce, la producción pasa a 0 kg/h, el flujo va del tanque a la hidrogenera, el primer camión carga junto al surtidor y sale levantando polvo; un segundo recorre el camino y se detiene en el mismo punto. La línea de estado narra la fase actual.
 6. Si la cámara o el seguimiento fallan, abre **Ver modelo 3D sin RA**. Arrastra para girar y pellizca o usa la rueda para acercar.
 
 Las cifras de pantalla son **simuladas con fines demostrativos** y representan instantáneas de cada escenario; las animaciones ilustran el flujo, sin recalcular esas cifras cuadro a cuadro. La regla conceptual de gestión es producir H₂ si hay generación solar superior a la demanda más un margen, y abastecer si existe reserva suficiente y demanda de transporte. No se implementa IA real ni se modela una planta construida. El agua para electrólisis en Antofagasta exigiría una fuente y tratamiento apropiados; estudiar agua desalinizada o tratada sería una siguiente etapa.
@@ -38,6 +38,7 @@ Las cifras de pantalla son **simuladas con fines demostrativos** y representan i
 - **Visor 3D:** la maqueta se eleva en pantallas móviles para dejar espacio sobre el panel. `npm test` verifica la separación de ambos, que la escena se dibuja, que los escenarios cambian y que no hay errores JavaScript.
 - **Reconocimiento:** `tests/ar-camera.mjs` verifica que MindAR reconoce el marcador con una cámara simulada. Aún hay que probar el montaje físico en Android o iPhone antes de exponer.
 - **Escenarios animados:** `npm test` comprueba el aumento del sol, el flujo hacia el tanque, la salida del primer camión, la llegada del segundo y el texto de estado.
+- **Detalles visuales:** las texturas de terreno, carretera y paneles se generan con Canvas y no requieren descargas adicionales. Las partículas solares recorren el espacio entre sol y paneles; la manguera aparece durante la carga y el polvo acompaña el inicio de movimiento. El visor móvil conserva la maqueta por encima del panel.
 
 ## Tecnología y atribuciones
 
